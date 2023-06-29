@@ -20,13 +20,15 @@ window.addEventListener("load", function(){
     
     let feedDateTime = [];
     
+    let counter = 0;
+    let threshold = [];
+    
     fetch('https://api.thingspeak.com/channels/2178227/feeds.json?results=10')
     .then(response => response.json())
     .then(data => {
       
       console.log("Hello this is the length of the feed"+data.feeds.length);
       
-      let counter = 0;
       var i;
       for (i = 0; i < data.feeds.length; ++i) {
         tdsFeeds.push(data.feeds[i].field1);
@@ -34,7 +36,16 @@ window.addEventListener("load", function(){
         humidityFeeds.push(data.feeds[i].field3);
         airTempFeeds.push(data.feeds[i].field4);
         distanceFeeds.push(data.feeds[i].field5);
-
+        
+        threshold.push(data.feeds[i].field5);
+        
+        if(i >= 5){
+          console.log(data.feeds[i].field5);
+          if(Math.round(data.feeds[i].field5) <= 25){
+            counter++;
+          }
+        }
+      
         var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         var dateString = data.feeds[i].created_at;
         var dateObj = new Date(dateString);
@@ -58,10 +69,6 @@ window.addEventListener("load", function(){
 
         feedDateTime.push(formattedDate+" "+formattedTime);
         
-        // threshold.push(data.feeds[9].field5);
-        if(Math.round(data.feeds[9].field5) <= 25){
-          counter++;
-        }
       }
       
       var tdsEL = document.getElementById("tds-value");
